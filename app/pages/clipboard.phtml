@@ -1,0 +1,17 @@
+<? $this->partial('partials/top.phtml') ?>
+
+<h1>Clipboard</h1>
+
+
+
+<div id="clipboard">
+<? foreach ($this->clipboard as $photo): ?>
+	<img data-id="<?= $photo['id'] ?>" src="<?= $this->flickrImageUrl($photo, $photo['id'], 'b') ?>" alt="">
+<? endforeach ?>
+</div>
+
+
+
+
+
+<? $this->partial('partials/bottom.phtml') ?>

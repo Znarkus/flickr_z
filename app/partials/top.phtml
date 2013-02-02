@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<base href="/">
+	<title>Z</title>
+	<link rel="stylesheet" href="app/css/normalize.css">
+	<link rel="stylesheet" href="app/css/main.css">
+	<script src="app/js/jquery-1.9.0.min.js"></script>
+	<script src="app/js/jquery.scrollTo.min.js"></script>
+	<script>
+	var clipboard = <?= json_encode($this->clipboard) ?>;
+	function clipboardChanged() {
+		var $e, l = Object.keys(clipboard).length;
+		$e = $('#nav .clipboard span').text('(' + l + ')');
+		
+		if (l > 0) {
+			$e.removeClass('empty');
+		} else {
+			$e.addClass('empty');
+		}
+	}
+	</script>
+</head>
+<body<?= isset($this->page) ? " class=\"{$this->page}\"" : '' ?>>
+
+<? if (!isset($this->logged_in) || $this->logged_in): ?>
+<nav id="nav">
+	<ol>
+		<li><a href="./">Sets</a></li>
+		<li class="clipboard"><a href="clipboard">Clipboard <span></span></a></li>
+		<li><a href="log_out">Log out</a></li>
+	</ol>
+</nav>
+<script> clipboardChanged(); </script>
+<? endif ?>
+
+<div id="content">

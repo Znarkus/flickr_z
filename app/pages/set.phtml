@@ -1,0 +1,43 @@
+<? $this->partial('partials/top.phtml', array('page' => 'set')) ?>
+
+<ol id="sets">
+<? foreach ($this->sets as $set): ?>
+	<li<?= $set['id'] == $this->info['photoset']['id'] ? ' class="selected"' : '' ?>>
+		<a href="set/<?= $set['id'] ?>">
+			<img src="<?= $this->flickrImageUrl($set, $set['primary'], 'q') ?>" alt="">
+			<span><?= $set['title']['_content'] ?></span>
+		</a>
+	</li>
+<? endforeach ?>	
+</ol>
+
+<script>
+$('#sets').scrollTo('li.selected', { offset: $('#sets li.selected').innerWidth() / 2 - $('#sets').width() / 2 });
+</script>
+
+<h1><?= $this->info['photoset']['title']['_content'] ?></h1>
+
+<div id="set">
+<? foreach ($this->photos['photoset']['photo'] as $index => $photo): ?>
+	<img data-index="<?= $index ?>" <?= isset($_SESSION['clipboard'][$photo['id']]) ? 'class="selected"' : '' ?> src="<?= $this->flickrImageUrl($photo, $photo['id'], '') ?>" alt="">
+<? endforeach ?>
+</div>
+
+<script type="text/javascript">
+var photos = <?= json_encode($this->photos['photoset']['photo']) ?>;
+$('#set img').click(function () {
+	var $img = $(this), photo = photos[$img.data('index')];
+	
+	$.post('clipboard/toggle', { photo: photo }, function (r) {
+		clipboard = r.clipboard;
+		clipboardChanged();
+		$img.toggleClass('selected');
+	});
+	
+});
+</script>
+
+
+
+
+<? $this->partial('partials/bottom.phtml') ?>

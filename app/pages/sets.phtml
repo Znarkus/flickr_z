@@ -1,0 +1,32 @@
+<? $this->partial('partials/top.phtml', array('page' => 'sets')) ?>
+
+<h1>Sets</h1>
+
+<ol id="sets">
+<? foreach ($this->sets as $set): ?>
+	<li>
+		<a href="set/<?= $set['id'] ?>">
+			<div class="image" style="background-image: url(<?= $this->flickrImageUrl($set, $set['primary'], 'n') ?>);"></div>
+			<span><?= $set['title']['_content'] ?></span>
+		</a>
+	</li>
+<? endforeach ?>
+</ol>
+
+<ol id="pagination">
+<? for ($p = 1; $p <= $this->pages; $p++): ?>
+	<li>
+		<? if ($this->current_page == $p): ?>
+			<span><?= $p ?></span>
+		<? else: ?>
+			<a href="<?= $this->query('page', $p) ?>"><?= $p ?></a>
+		<? endif ?>
+	</li>
+<? endfor ?>
+</ol>
+
+
+
+
+
+<? $this->partial('partials/bottom.phtml') ?>
