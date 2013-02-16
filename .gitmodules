@@ -1,6 +1,6 @@
 [submodule "lib/klein"]
 	path = lib/klein
-	url = git@github.com:chriso/klein.php.git
+	url = git://github.com/chriso/klein.php.git
 [submodule "lib/dpzflickr"]
 	path = lib/dpzflickr
-	url = git@github.com:dopiaza/DPZFlickr.git
+	url = git://github.com/dopiaza/DPZFlickr.git

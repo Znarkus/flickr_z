@@ -81,7 +81,7 @@ respond('/clipboard', function (_Request $request, _Response $response, _App $ap
 	));
 });
 
-// Clipboard
+// Clipboard toggle
 respond('POST', '/clipboard/toggle', function (_Request $request, _Response $response, _App $app) {
 	$photo = $request->param('photo');
 	

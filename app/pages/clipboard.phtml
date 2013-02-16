@@ -4,14 +4,27 @@
 
 
 
-<div id="clipboard">
+<ol id="clipboard">
 <? foreach ($this->clipboard as $photo): ?>
-	<img data-id="<?= $photo['id'] ?>" src="<?= $this->flickrImageUrl($photo, $photo['id'], 'b') ?>" alt="">
+	<li>
+		<img data-id="<?= $photo['id'] ?>" src="<?= $this->flickrImageUrl($photo, $photo['id'], 'b') ?>" alt="">
+	</li>
 <? endforeach ?>
-</div>
+</ol>
 
 
 
+<script>
+$('#clipboard li').prepend($('<a>', {href: 'javascript:;'}).addClass('delete').text('X').click(function () {
+	var $this = $(this);
+	$.post('clipboard/toggle', { photo: clipboard[$this.next('img').data('id')] }, function (r) {
+		clipboard = r.clipboard;
+		clipboardChanged();
+		$this.parent().fadeOut();
+		
+	});
+}));
+</script>
 
 
 <? $this->partial('partials/bottom.phtml') ?>
