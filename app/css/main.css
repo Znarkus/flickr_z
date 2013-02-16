@@ -2,7 +2,7 @@ body { padding: 50px 0 0; }
 
 #nav { background: #333; position: fixed; top: 0; width: 100%; border-bottom: 2px solid #000; }
 #nav ol { padding: 5px 10px 3px; margin: 0; overflow: hidden; text-align: center; }
-#nav ol li { list-style: none; display: inline-block; font: 900 18px/1em "Arial Black", Arial; text-transform: uppercase; margin-right: 50px; }
+#nav ol li { list-style: none; display: inline-block; font: 900 18px/1em "Arial Black", Arial; text-transform: uppercase; margin-right: 50px; white-space: nowrap; }
 #nav ol li a { color: #eee; text-decoration: none; }
 #nav ol li.clipboard span.empty { display: none; }
 
