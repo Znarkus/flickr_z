@@ -7,7 +7,7 @@
 <ol id="clipboard">
 <? foreach ($this->clipboard as $photo): ?>
 	<li>
-		<img data-id="<?= $photo['id'] ?>" src="<?= $this->flickrImageUrl($photo, $photo['id'], 'b') ?>" alt="">
+		<img data-id="<?= $photo['id'] ?>" src="<?= $photo['sizes'][count($photo['sizes']) - 1]['source'] /*$this->flickrImageUrl($photo, $photo['id'], 'b')*/ ?>" alt="">
 	</li>
 <? endforeach ?>
 </ol>

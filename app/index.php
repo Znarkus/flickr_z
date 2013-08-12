@@ -31,6 +31,9 @@ respond(function ($request, $response, $app) {
 	// Redirect to /auth
 	//var_dump(parse_url($request->uri(), PHP_URL_PATH) !== '/auth', !$app->flickr->isAuthenticated());die;
 	if (!in_array(parse_url($request->uri(), PHP_URL_PATH), array('/auth', '/oauth')) && !$app->flickr->isAuthenticated()) {
+		session_destroy();
+		session_start();
+		
 		$response->redirect('/auth?return=' . urlencode($request->uri()));
 	}
 	
@@ -40,6 +43,7 @@ respond(function ($request, $response, $app) {
 respond('/', function ($request, $response, $app) {
 	$sets = $app->flickrCall('flickr.photosets.getList'/*, array('page' => 1, 'per_page' => 50)*/);
 	$page = $request->param('page', 1);
+	
 	//var_dump($app->flickr->call('flickr.photos.getSizes', array('photo_id' => $sets['photosets']['photoset'][0]['primary'])));
     $response->render('pages/sets.phtml', array(
     	'sets' => array_slice($sets['photosets']['photoset'], 50 * ($page - 1), 50),
@@ -88,6 +92,8 @@ respond('POST', '/clipboard/toggle', function (_Request $request, _Response $res
     if (isset($_SESSION['clipboard'][$photo['id']])) {
 		unset($_SESSION['clipboard'][$photo['id']]);
     } else {
+    	$r = $app->flickrCall('flickr.photos.getSizes', array('photo_id' => $photo['id']));
+    	$photo['sizes'] = $r['sizes']['size'];
 		$_SESSION['clipboard'][$photo['id']] = $photo;
     }
     
