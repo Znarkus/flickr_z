@@ -2,12 +2,12 @@
 
 <h1>Clipboard</h1>
 
-
+<a href="javascript:;" id="download_all">Download all</a>
 
 <ol id="clipboard">
 <? foreach ($this->clipboard as $photo): ?>
 	<li>
-		<img data-id="<?= $photo['id'] ?>" src="<?= $photo['sizes'][count($photo['sizes']) - 1]['source'] /*$this->flickrImageUrl($photo, $photo['id'], 'b')*/ ?>" alt="">
+		<img data-id="<?= $photo['id'] ?>" src="<?= /*$photo['sizes'][count($photo['sizes']) - 1]['source']*/ $this->flickrImageUrl($photo, $photo['id'], 'b') ?>" alt="">
 	</li>
 <? endforeach ?>
 </ol>
@@ -24,6 +24,55 @@ $('#clipboard li').prepend($('<a>', {href: 'javascript:;'}).addClass('delete').t
 		
 	});
 }));
+
+$('#download_all').click(function () {
+	var $image = $('#clipboard li:first'),
+		$status,
+		interval;
+	
+	$(this).next('.status').remove();
+	$status = $('<span class="status">').insertAfter(this),
+	
+	next();
+	
+	interval = setInterval(function () {
+		$status.append('.');
+	}, 500);
+	
+	function next() {
+		var $img = $('> img', $image),
+			image = clipboard[$img.data('id')];
+		
+		$status.text('Downloading ' + image.title + '..');
+		
+		$.post('clipboard/download/' + image.id, {}, function (r) {
+			if (!r.success) {
+				alert('Error, sorry');
+			}
+			
+			$image = $image.next('li');
+			
+			if ($image.length) {
+				next();
+			} else {
+				finish();
+			}
+		});
+	}
+	
+	function finish() {
+		$status.text('Packaging images..');
+		$.post('clipboard/download/package', {}, function (r) {
+			if (!r.success) {
+				alert('Error, sorry');
+			}
+			
+			clearInterval(interval);
+			$status.text('Thanks!');
+			location = 'clipboard/download/download';
+		});
+	}
+});
 </script>
 
 

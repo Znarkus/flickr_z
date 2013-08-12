@@ -85,6 +85,90 @@ respond('/clipboard', function (_Request $request, _Response $response, _App $ap
 	));
 });
 
+// Clipboard download
+respond('/clipboard/download/[:stage]', function (_Request $request, _Response $response, _App $app) {
+	set_time_limit(0); // unlimited max execution time
+	
+	/*if (!isset($_SESSION['clipboard_download_dir'])) {
+		//$_SESSION['clipboard']['download_dir'] = tempnam(sys_get_temp_dir(), 'flickr');
+		$_SESSION['clipboard_download_dir'] = '../tmp/' . session_id() . '/';
+		mkdir($_SESSION['clipboard_download_dir']);
+	}*/
+	
+	$download_dir = session_id() . '/';
+	$download_path = '../tmp/' . $download_dir;
+	$zip_file = 'clipboard.zip';
+	
+	if (!is_dir($download_path)) {
+		mkdir($download_path, 0777, true);
+	}
+	
+	if (is_numeric($request->stage)) {
+		$keys = array_keys($_SESSION['clipboard']);
+		$photo = &$_SESSION['clipboard'][$request->stage];
+		
+		if (!isset($photo['sizes'])) {
+			$r = $app->flickrCall('flickr.photos.getSizes', array('photo_id' => $photo['id']));
+    		$photo['sizes'] = $r['sizes']['size'];
+		}
+		
+		$flickr_url = $photo['sizes'][count($photo['sizes']) - 1]['source'];
+		//$file = tempnam(sys_get_temp_dir(), 'flickr');
+		$file = basename($flickr_url);
+		
+		if (!is_file($download_path . $file)) {
+			$fh = fopen($download_path . $file, 'w');
+			
+			$options = array(
+				CURLOPT_FILE    => $fh,
+				CURLOPT_TIMEOUT => 28800, // set this to 8 hours so we dont timeout on big files
+				CURLOPT_URL     => $flickr_url,
+			);
+
+			$ch = curl_init();
+			curl_setopt_array($ch, $options);
+			curl_exec($ch);
+		}
+		
+		$photo['downloaded'] = $file;
+		$response->json(array('success' => true));
+		
+	} else if ($request->stage === 'package') {
+		if (is_file($download_path . $zip_file)) {
+			unlink($download_path . $zip_file);
+		}
+		
+		$files = array();
+		
+		foreach ($_SESSION['clipboard'] as $photo) {
+			$files[] = $photo['downloaded'];
+		}
+		
+		if (PHP_OS == 'WINNT') {
+			$bin = realpath('zip.exe');
+			$cwd = getcwd();
+			chdir($download_path);
+			$cmd = $bin . ' -0 ' . $zip_file . ' ' . implode(' ', $files);
+			var_dump($cmd);
+			exec($cmd, $o, $r);
+			chdir($cwd);
+			
+			if ($r) {
+				throw new Exception("Error code {$r} while zipping");
+			}
+		}
+		
+		$response->json(array('success' => true));
+	
+	} else if ($request->stage === 'download') {
+		$response->header('X-Accel-Redirect', '/f/' . $download_dir . $zip_file);
+		$response->header('Content-Disposition', 'attachment; filename=' . $zip_file);
+		//$response->header('X-Accel-Limit-Rate', 1024 * 50);	// 50kB/s
+		$response->header('Content-type', '');
+	
+	}
+});
+
 // Clipboard toggle
 respond('POST', '/clipboard/toggle', function (_Request $request, _Response $response, _App $app) {
 	$photo = $request->param('photo');
@@ -92,8 +176,6 @@ respond('POST', '/clipboard/toggle', function (_Request $request, _Response $res
     if (isset($_SESSION['clipboard'][$photo['id']])) {
 		unset($_SESSION['clipboard'][$photo['id']]);
     } else {
-    	$r = $app->flickrCall('flickr.photos.getSizes', array('photo_id' => $photo['id']));
-    	$photo['sizes'] = $r['sizes']['size'];
 		$_SESSION['clipboard'][$photo['id']] = $photo;
     }
     
