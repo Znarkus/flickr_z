@@ -146,16 +146,19 @@ respond('/clipboard/download/[:stage]', function (_Request $request, _Response $
 		
 		if (PHP_OS == 'WINNT') {
 			$bin = realpath('zip.exe');
-			$cwd = getcwd();
-			chdir($download_path);
-			$cmd = $bin . ' -0 ' . $zip_file . ' ' . implode(' ', $files);
-			var_dump($cmd);
-			exec($cmd, $o, $r);
-			chdir($cwd);
-			
-			if ($r) {
-				throw new Exception("Error code {$r} while zipping");
-			}
+		} else {
+			$bin = 'zip';
+		}
+		
+		$cwd = getcwd();
+		chdir($download_path);
+		$cmd = $bin . ' -0 ' . $zip_file . ' ' . implode(' ', $files);
+		var_dump($cmd);
+		exec($cmd, $o, $r);
+		chdir($cwd);
+		
+		if ($r) {
+			throw new Exception("Error code {$r} while zipping");
 		}
 		
 		$response->json(array('success' => true));
