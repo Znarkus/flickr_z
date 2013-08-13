@@ -26,25 +26,33 @@ $('#clipboard li').prepend($('<a>', {href: 'javascript:;'}).addClass('delete').t
 }));
 
 $('#download_all').click(function () {
-	var $image = $('#clipboard li:first'),
+	var $button = $(this),
+		$image = $('#clipboard li:first'),
+		steps = $('#clipboard li').length + 1,
+		currentStep = 0,
 		$status,
 		interval;
 	
-	$(this).next('.status').remove();
+	$button.hide().
+		next('.status').remove();
 	$status = $('<span class="status">').insertAfter(this),
 	
 	next();
 	
 	interval = setInterval(function () {
-		$status.append('.');
-	}, 500);
+		$status.append('|');
+	}, 200);
+	
+	function status(text) {
+		$status.text(Math.floor((currentStep / steps) * 100) + '%. ' + text);
+	}
 	
 	function next() {
 		var $img = $('> img', $image),
 			image = clipboard[$img.data('id')];
 		
-		$status.text('Downloading ' + image.title + '..');
-		
+		currentStep++;
+		status('Downloading ' + image.title + '. ');
 		$.post('clipboard/download/' + image.id, {}, function (r) {
 			if (!r.success) {
 				alert('Error, sorry');
@@ -61,14 +69,17 @@ $('#download_all').click(function () {
 	}
 	
 	function finish() {
-		$status.text('Packaging images..');
+		currentStep++;
+		status('Packaging images. ');
+		
 		$.post('clipboard/download/package', {}, function (r) {
 			if (!r.success) {
 				alert('Error, sorry');
 			}
 			
 			clearInterval(interval);
-			$status.text('Thanks!');
+			status('Thanks!');
+			$button.show();
 			location = 'clipboard/download/download';
 		});
 	}

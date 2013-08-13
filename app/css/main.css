@@ -46,4 +46,5 @@ ol#clipboard li { display: table; margin: 10px 0; }
 ol#clipboard img { clear: both; display: block; max-width: 800px; }
 ol#clipboard .delete { float: right; color: #fff; background: rgba(0,0,0,0.5); padding: 5px; font: 900 14px/1em "Arial Black", Arial; text-decoration: none; margin-bottom: -24px; position: relative; }
 
-#download_all + .status { margin-left: 15px; font-style: italic; }
+#download_all { margin-right: 15px; }
+#download_all + .status { font-style: italic; }
